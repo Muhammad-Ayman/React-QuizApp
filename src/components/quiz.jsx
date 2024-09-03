@@ -5,17 +5,42 @@ import QuestionTimer from "./timer";
 
 export default function Quiz() {
   const [userAnswer, setUserAnswer] = useState([]);
-  const questionIndex = userAnswer.length;
+  const [selectedState, setSelectedState] = useState("");
+  const questionIndex =
+    selectedState === "" ? userAnswer.length : userAnswer.length - 1;
+
   const isQuizCompleted = questionIndex === questions.length;
 
-  const TIMER = 3000;
-  const updateAnswer = useCallback((answer) => {
-    setUserAnswer((prev) => [...prev, answer]);
-  }, []);
+  let TIMER = 6000;
+  const updateAnswer = useCallback(
+    (answer) => {
+      setUserAnswer((prev) => [...prev, answer]);
+      if (answer !== "") {
+        setSelectedState("selected");
+        console.log("selected");
+        setTimeout(() => {
+          TIMER = 1000;
+          if (answer === questions[questionIndex].answers[0]) {
+            setSelectedState("correct");
+            console.log("correct");
+          } else {
+            setSelectedState("wrong");
+            console.log("wrong");
+          }
+        }, 1000);
+        setTimeout(() => {
+          TIMER = 2000;
+          setSelectedState("");
+          console.log("reset");
+        }, 2000);
+      }
+    },
+    [questionIndex]
+  );
 
   const handleSkip = useCallback(() => {
-    updateAnswer("");
-  }, [updateAnswer]);
+    if (selectedState === "") updateAnswer("");
+  }, [updateAnswer, selectedState]);
 
   if (isQuizCompleted) {
     return (
@@ -35,9 +60,10 @@ export default function Quiz() {
     );
   }
 
-  const shuffledAnswers = questions[questionIndex].answers.sort(
-    () => Math.random() - 0.5
-  );
+  const shuffledAnswers = questions[questionIndex].answers;
+  if (selectedState === "") {
+    shuffledAnswers.sort(() => Math.random() - 0.5);
+  }
   return (
     <div id="quiz">
       <div id="question">
@@ -45,7 +71,14 @@ export default function Quiz() {
         <ul id="answers">
           {shuffledAnswers.map((answer) => (
             <li key={answer} className="answer">
-              <button onClick={() => updateAnswer(answer)}>{answer}</button>
+              <button
+                className={
+                  userAnswer[questionIndex] === answer ? selectedState : ""
+                }
+                onClick={() => updateAnswer(answer)}
+              >
+                {answer}
+              </button>
             </li>
           ))}
         </ul>
