@@ -21,7 +21,7 @@ This is a React-based quiz application created as part of the Maxmillian Udemy "
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/react-quiz-app.git
+   git clone git@github.com:Muhammad-Ayman/React-QuizApp.git
 
    ```
 
